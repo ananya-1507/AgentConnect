@@ -7,6 +7,12 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BASE_DIR / ".env")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    # Railway supplies plain postgres:// or postgresql:// URLs; pin the installed psycopg2 driver.
+    for prefix in ("postgres://", "postgresql://"):
+        if DATABASE_URL.startswith(prefix):
+            DATABASE_URL = "postgresql+psycopg2://" + DATABASE_URL[len(prefix):]
+            break
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "gemini-embedding-001")
